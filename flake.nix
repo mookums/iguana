@@ -27,6 +27,15 @@
       in {
         inherit lib;
 
+        # For working on Iguana.
+        devShells.default = lib.mkShell {
+          withZls = true;
+          extraPackages = with pkgs; [
+            python3
+            python312Packages.python-lsp-server
+          ];
+        };
+      }) // {
         templates = rec {
           default = hello-world;
           hello-world = {
@@ -39,14 +48,5 @@
             path = "./examples/website";
           };
         };
-
-        # For working on Iguana.
-        devShells.default = lib.mkShell {
-          withZls = true;
-          extraPackages = with pkgs; [
-            python3
-            python312Packages.python-lsp-server
-          ];
-        };
-      });
+      };
 }
