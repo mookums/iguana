@@ -13,14 +13,27 @@
     zls-master.url = "github:zigtools/zls/master";
   };
 
-  outputs = inputs@{ nixpkgs, zigPkgs, flake-utils, ... }:
+  outputs = inputs@{ self, nixpkgs, zigPkgs, flake-utils, ... }:
     let
       zigStable = "0.13.0";
       zigSystems = builtins.attrNames zigPkgs.packages;
 
       mkSystemLib = import ./lib { inherit nixpkgs inputs zigPkgs zigStable; };
 
-    in flake-utils.lib.eachSystem zigSystems (system:
+    in {
+      templates = rec {
+        default = hello-world;
+        hello-world = {
+          description = "Basic Zig Project";
+          path = self + "/examples/hello-world";
+        };
+
+        website = {
+          description = "Build a Zig HTTP Server";
+          path = self + "/examples/website";
+        };
+      };
+    } // (flake-utils.lib.eachSystem zigSystems (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
         lib = mkSystemLib system;
@@ -35,18 +48,5 @@
             python312Packages.python-lsp-server
           ];
         };
-      }) // {
-        templates = rec {
-          default = hello-world;
-          hello-world = {
-            description = "Basic Zig Project";
-            path = "./examples/hello-world";
-          };
-
-          website = {
-            description = "Build a Zig HTTP Server";
-            path = "./examples/website";
-          };
-        };
-      };
+      }));
 }
