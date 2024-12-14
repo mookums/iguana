@@ -377,14 +377,17 @@
         "zls-master": "zls-master"
       },
       "locked": {
-        "lastModified": 0,
-        "narHash": "sha256-pp9sor/iu0YRMGWYsHxBiPsEDtG8TmbORxE4wfHFE0Y=",
-        "type": "git",
-        "url": "file:../../"
+        "lastModified": 1734155387,
+        "narHash": "sha256-c7IyL0ljhbM6MvUT/GaYwqsXY37uFi6ODdb6Nt6NpHY=",
+        "owner": "mookums",
+        "repo": "iguana",
+        "rev": "74034ec663be6e1a1e719127367a0e172dcfdff6",
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "file:../../"
+        "owner": "mookums",
+        "repo": "iguana",
+        "type": "github"
       }
     },
     "known_folders": {
@@ -517,16 +520,16 @@
     },
     "nixpkgs_7": {
       "locked": {
-        "lastModified": 1734049781,
-        "narHash": "sha256-8RyistWsEpaA7n15Lyq+wB2SLkrWDCKhQ8rv9JFxkMA=",
+        "lastModified": 1734142862,
+        "narHash": "sha256-oz3fD7Avb6Af7HWLFr1279iASjE9GyZMKuIf1ubmK8M=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "dc51d2e760a4d6ddc379a65cd3b387958b301548",
+        "rev": "64d3c76c05fb2d5511d86d522640bb58e4b18ea4",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
-        "ref": "release-24.05",
+        "ref": "release-24.11",
         "repo": "nixpkgs",
         "type": "github"
       }
