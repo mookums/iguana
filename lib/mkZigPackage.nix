@@ -1,7 +1,8 @@
 { nixpkgs, inputs, zigSystem, zigPkgs, zigStable }:
 system:
 { pname, version, src, target ? zigSystem, releaseMode ? "ReleaseSafe"
-, zigBuildFlags ? [ ], zigVersion ? zigStable, nativeBuildInputs ? [ ] }@args:
+, zigBuildFlags ? [ ], zigVersion ? zigStable, nativeBuildInputs ? [ ], ...
+}@args:
 let
   mkZigOverlay = import ./mkZigOverlay.nix { inherit zigPkgs zigVersion; };
   lib = nixpkgs.lib;
