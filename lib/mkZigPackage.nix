@@ -1,8 +1,7 @@
 { nixpkgs, inputs, zigSystem, zigPkgs, zigStable }:
 system:
 { pname, version, src, target ? zigSystem, releaseMode ? "ReleaseSafe"
-, zigBuildFlags ? [ ], zigVersion ? zigStable, nativeBuildInputs ? [ ]
-, buildInputs ? [ ], doCheck ? true, ... }@args:
+, zigBuildFlags ? [ ], zigVersion ? zigStable, nativeBuildInputs ? [ ] }@args:
 let
   mkZigOverlay = import ./mkZigOverlay.nix { inherit zigPkgs zigVersion; };
   lib = nixpkgs.lib;
@@ -70,11 +69,11 @@ let
 
   flatDeps = flattenDeps allDeps;
 
-  zigDeps = pkgs.stdenv.mkDerivation {
+  zigDeps = pkgs.stdenv.mkDerivation (args // {
     name = "${pname}-deps";
     inherit src version;
 
-    nativeBuildInputs = with pkgs; [ zig jq ];
+    nativeBuildInputs = (args.nativeBuildInputs or [ ]) ++ [ pkgs.zig pkgs.jq ];
 
     buildPhase = ''
       mkdir -p $TMPDIR/zig-global-cache/p/
@@ -109,13 +108,11 @@ let
     '';
 
     dontFixup = true;
-  };
-
-  finalNativeBuildInputs = [ pkgs.zig ] ++ nativeBuildInputs;
+  });
 
 in pkgs.stdenv.mkDerivation (args // {
-  inherit pname version src buildInputs;
-  nativeBuildInputs = finalNativeBuildInputs ++ [ pkgs.jq ];
+  inherit pname version src;
+  nativeBuildInputs = (args.nativeBuildInputs or [ ]) ++ [ pkgs.zig ];
 
   preBuildPhases = [ "zigSetupPhase" ];
   zigSetupPhase = ''
