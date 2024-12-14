@@ -113,7 +113,8 @@ let
 
 in pkgs.stdenv.mkDerivation (args // {
   inherit pname version src;
-  nativeBuildInputs = (args.nativeBuildInputs or [ ]) ++ [ pkgs.zig ];
+  nativeBuildInputs = (args.nativeBuildInputs or [ ])
+    ++ [ pkgs.autoPatchelfHook pkgs.zig ];
 
   preBuildPhases = [ "zigSetupPhase" ];
   zigSetupPhase = ''
