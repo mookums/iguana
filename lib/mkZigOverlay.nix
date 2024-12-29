@@ -1,4 +1,6 @@
-{ zigPkgs, zigVersion }:
-zigVersion: final: prev: {
+{
+  zigPkgs,
+  zigVersion,
+}: zigVersion: final: prev: {
   zig = zigPkgs.packages.${prev.system}.${zigVersion};
 }

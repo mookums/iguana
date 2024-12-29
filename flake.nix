@@ -13,14 +13,19 @@
     zls-master.url = "github:zigtools/zls/master";
   };
 
-  outputs = inputs@{ self, nixpkgs, zigPkgs, flake-utils, ... }:
-    let
-      zigStable = "0.13.0";
-      zigSystems = builtins.attrNames zigPkgs.packages;
+  outputs = inputs @ {
+    self,
+    nixpkgs,
+    zigPkgs,
+    flake-utils,
+    ...
+  }: let
+    zigStable = "0.13.0";
+    zigSystems = builtins.attrNames zigPkgs.packages;
 
-      mkSystemLib = import ./lib { inherit nixpkgs inputs zigPkgs zigStable; };
-
-    in {
+    mkSystemLib = import ./lib {inherit nixpkgs inputs zigPkgs zigStable;};
+  in
+    {
       templates = rec {
         default = hello-world;
         hello-world = {
@@ -33,20 +38,20 @@
           path = self + "/examples/website";
         };
       };
-    } // (flake-utils.lib.eachSystem zigSystems (system:
-      let
-        pkgs = nixpkgs.legacyPackages.${system};
-        lib = mkSystemLib system;
-      in {
-        inherit lib;
+    }
+    // (flake-utils.lib.eachSystem zigSystems (system: let
+      pkgs = nixpkgs.legacyPackages.${system};
+      lib = mkSystemLib system;
+    in {
+      inherit lib;
 
-        # For working on Iguana.
-        devShells.default = lib.mkShell {
-          withZls = true;
-          extraPackages = with pkgs; [
-            python3
-            python312Packages.python-lsp-server
-          ];
-        };
-      }));
+      # For working on Iguana.
+      devShells.default = lib.mkShell {
+        withZls = true;
+        extraPackages = with pkgs; [
+          python3
+          python312Packages.python-lsp-server
+        ];
+      };
+    }));
 }
