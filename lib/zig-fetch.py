@@ -61,8 +61,10 @@ def parse_zon_dependencies(zon_str):
 def fetch_dependency(dep, output_dir):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
+
+    dep_title = dep.get('url', dep.get('path', 'Unknown'))
     
-    print(f"Fetching {dep['url']} using zig fetch")
+    print(f"Fetching {dep_title} using zig fetch")
 
     if 'url' in dep:
         fetch_cmd = ['zig', 'fetch', '--global-cache-dir', output_dir, dep['url']]
@@ -75,12 +77,12 @@ def fetch_dependency(dep, output_dir):
         result = subprocess.run(fetch_cmd, capture_output=True, text=True, check=True)
         fetched_hash = result.stdout.strip()
 
-        print(f"Successfully fetched {dep['url']}")
+        print(f"Successfully fetched {dep_title}")
         dep_path = os.path.join(output_dir, "p", fetched_hash)
         build_zig_zon_path = os.path.join(dep_path, 'build.zig.zon')
 
         if os.path.exists(build_zig_zon_path):
-            print(f"Found build.zig.zon in {dep['url']}, parsing and fetching recursive dependencies.")
+            print(f"Found build.zig.zon in {dep_path}, parsing and fetching recursive dependencies.")
             with open(build_zig_zon_path, 'r') as f:
                 zon_content = f.read()
                 recursive_deps = parse_zon_dependencies(zon_content)
@@ -88,13 +90,13 @@ def fetch_dependency(dep, output_dir):
                 for recursive_dep in recursive_deps:
                     fetch_dependency(recursive_dep, output_dir)
         else:
-            print(f"Did not find another build.zig.zon in {dep['url']}.")
+            print(f"Did not find another build.zig.zon in {dep_path}.")
 
 
     except subprocess.CalledProcessError as e:
-        print(f"Failed to fetch dependency: {dep.get('url', dep.get('path', 'Unknown'))}. Error: {e}")
+        print(f"Failed to fetch dependency: {dep_title}. Error: {e}")
     except Exception as e:
-        print(f"Unexpected error occured while fetching {dep['url']}: {e}")
+        print(f"Unexpected error occured while fetching {dep_title}: {e}")
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:

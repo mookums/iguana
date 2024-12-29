@@ -377,14 +377,17 @@
         "zls-master": "zls-master"
       },
       "locked": {
-        "lastModified": 0,
-        "narHash": "sha256-3XCIQatl/sRrioBAvdSK1gdxuSNu1w1M7ciA0/L9q4U=",
-        "path": "/nix/store/s6sgp0djncig48v1h3w84hqdz6b10xdq-source",
-        "type": "path"
+        "lastModified": 1735513705,
+        "narHash": "sha256-10zVjF418ARY7k1ZZOTwK7bdwB4rTTUvuJvJl9pjS6Y=",
+        "owner": "mookums",
+        "repo": "iguana",
+        "rev": "b8b9cd3308eb29c5f18f9a1309356771c3d839d9",
+        "type": "github"
       },
       "original": {
-        "path": "/nix/store/s6sgp0djncig48v1h3w84hqdz6b10xdq-source",
-        "type": "path"
+        "owner": "mookums",
+        "repo": "iguana",
+        "type": "github"
       }
     },
     "known_folders": {
