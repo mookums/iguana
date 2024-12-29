@@ -3,7 +3,8 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/release-24.11";
-    iguana.url = "github:mookums/iguana";
+    # iguana.url = "github:mookums/iguana";
+    iguana.url = "git+file://../../../";
   };
 
   outputs = { iguana, ... }:
@@ -16,6 +17,7 @@
           pname = "hello-world";
           version = "0.1.0";
           src = ./.;
+          depsHash = "sha256-bzzRYxC64g3LmnJ2nfmFjuD8rqjYatwWjXY8XgAk8T0=";
           # target = "x86_64-linux-gnu";
           releaseMode = "Debug";
           doCheck = false;

@@ -1,6 +1,8 @@
+import os
 import sys
 import json
 import re
+import subprocess
 
 def parse_zon_dependencies(zon_str):
     deps_match = re.search(r'\.dependencies\s*=\s*\.\{((?:[^{}]|{[^{}]*})*)\}', zon_str, re.DOTALL)
@@ -56,13 +58,51 @@ def parse_zon_dependencies(zon_str):
     
     return dependencies
 
+def fetch_dependency(dep, output_dir):
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    
+    print(f"Fetching {dep['url']} using zig fetch")
+    try:
+        result = subprocess.run(['zig', 'fetch', '--global-cache-dir', output_dir, dep['url']],
+                                capture_output=True, text=True, check=True)
+
+        fetched_hash = result.stdout.strip()
+
+        print(f"Successfully fetched {dep['url']}")
+        dep_path = os.path.join(output_dir, "p", fetched_hash)
+        build_zig_zon_path = os.path.join(dep_path, 'build.zig.zon')
+
+        if os.path.exists(build_zig_zon_path):
+            print(f"Found build.zig.zon in {dep['url']}, parsing and fetching recursive dependencies.")
+            with open(build_zig_zon_path, 'r') as f:
+                zon_content = f.read()
+                recursive_deps = parse_zon_dependencies(zon_content)
+                
+                # Recursively fetch the dependencies
+                for recursive_dep in recursive_deps:
+                    fetch_dependency(recursive_dep, output_dir)
+        else:
+            print(f"Did not find another build.zig.zon in {dep['url']}.")
+
+
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to fetch {dep['url']}: {e}")
+    except Exception as e:
+        print(f"Unexpected error occured while fetching {dep['url']}: {e}")
+
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print("Usage: script.py <zon_file_path>", file=sys.stderr)
+    if len(sys.argv) != 3:
+        print("Usage: zig-fetch.py <zon_file_path> <output dir>", file=sys.stderr)
         sys.exit(1)
         
     with open(sys.argv[1], 'r') as f:
         zon_content = f.read()
-    
+
+    output_dir = sys.argv[2];
     deps = parse_zon_dependencies(zon_content)
-    print(json.dumps(deps, indent=2))
+    
+    for dep in deps:
+        fetch_dependency(dep, output_dir)
+
+    print(f"All dependencies have been processed and stored in {output_dir}")
