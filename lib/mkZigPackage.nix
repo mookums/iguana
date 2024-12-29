@@ -32,7 +32,7 @@
       name = "${pname}-deps";
       inherit src version;
 
-      nativeBuildInputs = (args.nativeBuildInputs or []) ++ [pkgs.zig pkgs.python3 pkgs.jq];
+      nativeBuildInputs = (args.nativeBuildInputs or []) ++ [pkgs.zig pkgs.python3];
 
       buildPhase = ''
         mkdir -p $TMPDIR/zig-global-cache

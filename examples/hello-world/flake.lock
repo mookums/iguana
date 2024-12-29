@@ -377,11 +377,11 @@
         "zls-master": "zls-master"
       },
       "locked": {
-        "lastModified": 1735513705,
-        "narHash": "sha256-10zVjF418ARY7k1ZZOTwK7bdwB4rTTUvuJvJl9pjS6Y=",
+        "lastModified": 1735514084,
+        "narHash": "sha256-CvsD8RtQmsrQltKJ591UsrElDcAJCa649CVbMN99xCs=",
         "owner": "mookums",
         "repo": "iguana",
-        "rev": "b8b9cd3308eb29c5f18f9a1309356771c3d839d9",
+        "rev": "047405f6002eaf83073db3097985d27d26e6e83b",
         "type": "github"
       },
       "original": {
