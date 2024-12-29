@@ -63,10 +63,16 @@ def fetch_dependency(dep, output_dir):
         os.makedirs(output_dir)
     
     print(f"Fetching {dep['url']} using zig fetch")
-    try:
-        result = subprocess.run(['zig', 'fetch', '--global-cache-dir', output_dir, dep['url']],
-                                capture_output=True, text=True, check=True)
 
+    if 'url' in dep:
+        fetch_cmd = ['zig', 'fetch', '--global-cache-dir', output_dir, dep['url']]
+    elif 'path' in dep:
+        fetch_cmd = ['zig', 'fetch', '--global-cache-dir', output_dir, dep['path']]
+    else:
+        raise ValueError("Either 'url' or 'path' must be provided for the dependency.")
+
+    try:
+        result = subprocess.run(fetch_cmd, capture_output=True, text=True, check=True)
         fetched_hash = result.stdout.strip()
 
         print(f"Successfully fetched {dep['url']}")
@@ -79,7 +85,6 @@ def fetch_dependency(dep, output_dir):
                 zon_content = f.read()
                 recursive_deps = parse_zon_dependencies(zon_content)
                 
-                # Recursively fetch the dependencies
                 for recursive_dep in recursive_deps:
                     fetch_dependency(recursive_dep, output_dir)
         else:
@@ -87,7 +92,7 @@ def fetch_dependency(dep, output_dir):
 
 
     except subprocess.CalledProcessError as e:
-        print(f"Failed to fetch {dep['url']}: {e}")
+        print(f"Failed to fetch dependency: {dep.get('url', dep.get('path', 'Unknown'))}. Error: {e}")
     except Exception as e:
         print(f"Unexpected error occured while fetching {dep['url']}: {e}")
 
