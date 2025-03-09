@@ -7,9 +7,8 @@
 
     # ZLS versions
     # Not sure how else to do this and stay pure.
-    zls-0-12.url = "github:zigtools/zls/0.12.0";
     zls-0-13.url = "github:zigtools/zls/0.13.0";
-    # zls-0-14.url = "github:zigtools/zls/0.14.0";
+    zls-0-14.url = "github:zigtools/zls/0.14.0";
     zls-master.url = "github:zigtools/zls/master";
   };
 
@@ -22,7 +21,7 @@
       ...
     }:
     let
-      zigStable = "0.13.0";
+      zigStable = "0.14.0";
       zigSystems = builtins.attrNames zigPkgs.packages;
 
       mkSystemLib = import ./lib {
