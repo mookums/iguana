@@ -10,14 +10,12 @@
 }: let
   getZls = version:
     {
-      "0.11.0" = inputs.zls-0-11;
-      "0.12.0" = inputs.zls-0-12;
       "0.13.0" = inputs.zls-0-13;
       "0.14.0" = inputs.zls-0-14;
       "master" = inputs.zls-master;
     }
     .${version}
-    or inputs.zls-0-13;
+    or inputs.zls-0-14;
 
   mkZigOverlay = import ./mkZigOverlay.nix {inherit zigPkgs zigVersion;};
 
