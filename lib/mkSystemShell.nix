@@ -8,30 +8,13 @@
   extraPackages ? [],
   withZls ? false,
 }: let
-  getZls = version:
-    {
-      "0.13.0" = inputs.zls-0-13;
-      "0.14.0" = inputs.zls-0-14;
-      "master" = inputs.zls-master;
-    }
-    .${version}
-    or inputs.zls-0-14;
 
   mkZigOverlay = import ./mkZigOverlay.nix {inherit zigPkgs zigVersion;};
-
-  zlsOverlay =
-    if withZls
-    then
-      final: prev: {
-        zls =
-          (getZls zigVersion).packages.${prev.system}.zls.overrideAttrs
-          (old: {nativeBuildInputs = [final.zig];});
-      }
-    else _: _: {};
+  mkZlsOverlay = import ./mkZlsOverlay.nix {inherit zigPkgs zigVersion;};
 
   pkgs = import nixpkgs {
     inherit system;
-    overlays = [(mkZigOverlay zigVersion) zlsOverlay];
+    overlays = [(mkZigOverlay zigVersion) (mkZlsOverlay zigVersion)];
   };
 
   basePackages =
