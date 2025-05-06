@@ -12,11 +12,11 @@ let
 
   mkZigOverlay = import ./mkZigOverlay.nix {
     inherit zigPkgs;
-  } system;
+  };
 
   mkZlsOverlay = import ./mkZlsOverlay.nix {
     inherit zigPkgs;
-  } system;
+  };
 
   mkShell = import ./mkSystemShell.nix {
     inherit
