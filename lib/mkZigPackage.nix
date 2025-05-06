@@ -4,35 +4,41 @@
   zigSystem,
   zigPkgs,
   zigStable,
-}: system: {
+}:
+system:
+{
   pname,
   version,
   src,
   depsHash ? "",
   target ? zigSystem,
   releaseMode ? "ReleaseSafe",
-  zigBuildFlags ? [],
+  zigBuildFlags ? [ ],
   zigVersion ? zigStable,
-  nativeBuildInputs ? [],
+  nativeBuildInputs ? [ ],
   ...
-} @ args: let
-  mkZigOverlay = import ./mkZigOverlay.nix {inherit zigPkgs zigVersion;};
+}@args:
+let
+  mkZigOverlay = import ./mkZigOverlay.nix { inherit zigPkgs; };
   lib = nixpkgs.lib;
 
   pkgs = import nixpkgs {
     inherit system;
-    overlays = [(mkZigOverlay zigVersion)];
+    overlays = [ (mkZigOverlay zigVersion) ];
   };
 
-  fetchScript =
-    pkgs.writeText "zig-fetch.py" "${(builtins.readFile ./zig-fetch.py)}";
+  fetchScript = pkgs.writeText "zig-fetch.py" "${(builtins.readFile ./zig-fetch.py)}";
 
-  zigDeps = pkgs.stdenv.mkDerivation (args
+  zigDeps = pkgs.stdenv.mkDerivation (
+    args
     // {
       name = "${pname}-deps";
       inherit src version;
 
-      nativeBuildInputs = (args.nativeBuildInputs or []) ++ [pkgs.zig pkgs.python3];
+      nativeBuildInputs = (args.nativeBuildInputs or [ ]) ++ [
+        pkgs.zig
+        pkgs.python3
+      ];
 
       buildPhase = ''
         mkdir -p $TMPDIR/zig-global-cache
@@ -52,51 +58,53 @@
       outputHashMode = "recursive";
       outputHashAlgo = "sha256";
       outputHash = depsHash;
-    });
+    }
+  );
 in
-  pkgs.stdenv.mkDerivation (args
-    // {
-      inherit pname version src;
-      nativeBuildInputs =
-        (args.nativeBuildInputs or [])
-        ++ [pkgs.autoPatchelfHook pkgs.zig];
+pkgs.stdenv.mkDerivation (
+  args
+  // {
+    inherit pname version src;
+    nativeBuildInputs = (args.nativeBuildInputs or [ ]) ++ [
+      pkgs.autoPatchelfHook
+      pkgs.zig
+    ];
 
-      preBuildPhases = ["zigSetupPhase"];
-      zigSetupPhase = ''
-        mkdir -p $TMPDIR/zig-global-cache
-        mkdir -p $TMPDIR/zig-cache
-        mkdir -p $out/dep-info
-        cp -r ${zigDeps}/zig-global-cache $TMPDIR
-        chmod -R u+rw $TMPDIR/zig-global-cache
-        cp -r ${zigDeps}/dep-info $out
+    preBuildPhases = [ "zigSetupPhase" ];
+    zigSetupPhase = ''
+      mkdir -p $TMPDIR/zig-global-cache
+      mkdir -p $TMPDIR/zig-cache
+      mkdir -p $out/dep-info
+      cp -r ${zigDeps}/zig-global-cache $TMPDIR
+      chmod -R u+rw $TMPDIR/zig-global-cache
+      cp -r ${zigDeps}/dep-info $out
+    '';
+
+    buildPhase =
+      args.buildPhase or ''
+        runHook preBuild
+
+        zig build \
+        --cache-dir $TMPDIR/zig-cache \
+        --global-cache-dir $TMPDIR/zig-global-cache \
+        -Dtarget=${target} \
+        -Doptimize=${releaseMode} \
+        -p $out ${lib.concatStringsSep " " zigBuildFlags}
+
+        runHook postBuild
       '';
 
-      buildPhase =
-        args.buildPhase
-        or ''
-          runHook preBuild
+    doCheck = args.doCheck or true;
+    checkPhase =
+      args.checkPhase or ''
+        runHook preCheck
 
-          zig build \
-          --cache-dir $TMPDIR/zig-cache \
-          --global-cache-dir $TMPDIR/zig-global-cache \
-          -Dtarget=${target} \
-          -Doptimize=${releaseMode} \
-          -p $out ${lib.concatStringsSep " " zigBuildFlags}
+        zig build test --cache-dir $TMPDIR/zig-cache --global-cache-dir $TMPDIR/zig-global-cache
 
-          runHook postBuild
-        '';
+        runHook postCheck
+      '';
 
-      doCheck = args.doCheck or true;
-      checkPhase =
-        args.checkPhase
-        or ''
-          runHook preCheck
-
-          zig build test --cache-dir $TMPDIR/zig-cache --global-cache-dir $TMPDIR/zig-global-cache
-
-          runHook postCheck
-        '';
-
-      # Enable parallel building
-      enableParallelBuilding = true;
-    })
+    # Enable parallel building
+    enableParallelBuilding = true;
+  }
+)

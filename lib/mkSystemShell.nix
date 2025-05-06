@@ -3,27 +3,26 @@
   inputs,
   zigPkgs,
   zigStable,
-}: system: {
+}:
+system:
+{
   zigVersion ? zigStable,
-  extraPackages ? [],
+  extraPackages ? [ ],
   withZls ? false,
-}: let
+}:
+let
 
-  mkZigOverlay = import ./mkZigOverlay.nix {inherit zigPkgs zigVersion;};
-  mkZlsOverlay = import ./mkZlsOverlay.nix {inherit zigPkgs zigVersion;};
+  mkZigOverlay = import ./mkZigOverlay.nix { inherit zigPkgs; };
+  mkZlsOverlay = import ./mkZlsOverlay.nix { inherit zigPkgs; };
 
   pkgs = import nixpkgs {
     inherit system;
-    overlays = [(mkZigOverlay zigVersion) (mkZlsOverlay zigVersion)];
+    overlays = [
+      (mkZigOverlay zigVersion)
+      (mkZlsOverlay zigVersion)
+    ];
   };
 
-  basePackages =
-    [pkgs.zig]
-    ++ (
-      if withZls
-      then [pkgs.zls]
-      else []
-    )
-    ++ extraPackages;
+  basePackages = [ pkgs.zig ] ++ (if withZls then [ pkgs.zls ] else [ ]) ++ extraPackages;
 in
-  pkgs.mkShell {packages = basePackages;}
+pkgs.mkShell { packages = basePackages; }

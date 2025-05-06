@@ -1,6 +1,6 @@
 {
   zigPkgs,
-  zigVersion,
-}: zigVersion: final: prev: {
- zls = zigPkgs.packages.${prev.system}.${zigVersion}.zls;
+}:
+zigVersion: final: prev: {
+  zls = zigPkgs.packages.${prev.system}.${zigVersion}.zls;
 }
